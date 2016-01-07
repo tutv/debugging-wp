@@ -14,9 +14,9 @@ Debuggin helper for WordPress Developers.
 
 Plugin was built based on [Kint Project](http://raveren.github.io/kint/).
 
-Introduction to Kint
+= Introduction to Kint =
 
-At first glance Kint is just a pretty replacement for var_dump(), print_r() and debug_backtrace().
+At first glance Kint is just a pretty replacement for **var_dump()**, **print_r()** and **debug_backtrace()**.
 
 However, it's much, much more than that. Even the excellent xdebug var_dump improvements don't come close - you will eventually wonder how you developed without it.
 
@@ -30,9 +30,12 @@ However, it's much, much more than that. Even the excellent xdebug var_dump impr
 
 == Frequently Asked Questions ==
 
-= A question that someone might have =
+= How to use? =
 
-= What about foo bar? =
+Use functions to debug: **s**, **sd**, **d**, **ddd**
+
+Example:
+`<?php s($GLOBALS); ?>`
 
 == Screenshots ==
 
@@ -40,5 +43,11 @@ However, it's much, much more than that. Even the excellent xdebug var_dump impr
 `/assets/screenshots/debugging-02.png`
 
 == Changelog ==
-= 1.0.o =
+
+= 1.0.0 =
 * Initialize plugin
+
+== Upgrade Notice ==
+
+= 1.0.0 =
+Upgrade immediately.
