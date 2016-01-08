@@ -15,4 +15,9 @@ define( 'DEBUGGING_WP_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 /**
  * Require libraries
  */
-require_once DEBUGGING_WP_PLUGIN_DIR . 'vendor/autoload.php';
+require_once DEBUGGING_WP_PLUGIN_DIR . 'kint/Kint.class.php';
+
+/**
+ * Page admin
+ */
+require_once DEBUGGING_WP_PLUGIN_DIR . 'admin.php';

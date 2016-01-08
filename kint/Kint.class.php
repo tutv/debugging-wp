@@ -6,7 +6,9 @@
  */
 
 
-if ( defined( 'KINT_DIR' ) ) return;
+if ( defined( 'KINT_DIR' ) ) {
+	return;
+}
 
 
 define( 'KINT_DIR', dirname( __FILE__ ) . '/' );
@@ -24,7 +26,7 @@ if ( is_readable( KINT_DIR . 'config.php' ) ) {
 }
 
 # init settings
-if ( !empty( $GLOBALS['_kint_settings'] ) ) {
+if ( ! empty( $GLOBALS['_kint_settings'] ) ) {
 	Kint::enabled( $GLOBALS['_kint_settings']['enabled'] );
 
 	foreach ( $GLOBALS['_kint_settings'] as $key => $val ) {
@@ -34,8 +36,7 @@ if ( !empty( $GLOBALS['_kint_settings'] ) ) {
 	unset( $GLOBALS['_kint_settings'], $key, $val );
 }
 
-class Kint
-{
+class Kint {
 	// these are all public and 1:1 config array keys so you can switch them easily
 	private static $_enabledMode; # stores mode and active statuses
 
@@ -52,10 +53,10 @@ class Kint
 	public static $cliDetection;
 	public static $cliColors;
 
-	const MODE_RICH       = 'r';
+	const MODE_RICH = 'r';
 	const MODE_WHITESPACE = 'w';
-	const MODE_CLI        = 'c';
-	const MODE_PLAIN      = 'p';
+	const MODE_CLI = 'c';
+	const MODE_PLAIN = 'p';
 
 
 	public static $aliases = array(
@@ -79,17 +80,16 @@ class Kint
 	 * current mode.
 	 *
 	 * @param mixed $forceMode
-	 *      null or void - return current mode
-	 *      false        - disable (no output)
-	 *      true         - enable and detect cli automatically
-	 *      Kint::MODE_* - enable and force selected mode disregarding detection and function
+	 *                     null or void - return current mode
+	 *                     false        - disable (no output)
+	 *                     true         - enable and detect cli automatically
+	 *                     Kint::MODE_* - enable and force selected mode disregarding detection and function
 	 *                     shorthand (s()/d()), note that you can still override this
 	 *                     with the "~" modifier
 	 *
 	 * @return mixed        previously set value if a new one is passed
 	 */
-	public static function enabled( $forceMode = null )
-	{
+	public static function enabled( $forceMode = null ) {
 		# act both as a setter...
 		if ( isset( $forceMode ) ) {
 			$before             = self::$_enabledMode;
@@ -109,9 +109,10 @@ class Kint
 	 *
 	 * @return mixed
 	 */
-	public static function trace( $trace = null )
-	{
-		if ( !self::enabled() ) return '';
+	public static function trace( $trace = null ) {
+		if ( ! self::enabled() ) {
+			return '';
+		}
 
 		return self::dump( isset( $trace ) ? $trace : debug_backtrace( true ) );
 	}
@@ -152,9 +153,10 @@ class Kint
 	 *
 	 * @return void|string
 	 */
-	public static function dump( $data = null )
-	{
-		if ( !self::enabled() ) return '';
+	public static function dump( $data = null ) {
+		if ( ! self::enabled() ) {
+			return '';
+		}
 
 		list( $names, $modifiers, $callee, $previousCaller, $miniTrace ) = self::_getCalleeInfo(
 			defined( 'DEBUG_BACKTRACE_IGNORE_ARGS' )
@@ -255,12 +257,16 @@ class Kint
 		if ( strpos( $modifiers, '@' ) !== false ) {
 			self::$returnOutput = $returnOldValue;
 			self::$_firstRun    = $firstRunOldValue;
+
 			return $output;
 		}
 
-		if ( self::$returnOutput ) return $output;
+		if ( self::$returnOutput ) {
+			return $output;
+		}
 
 		echo $output;
+
 		return '';
 	}
 
@@ -273,30 +279,35 @@ class Kint
 	 *
 	 * @return string
 	 */
-	public static function shortenPath( $file )
-	{
+	public static function shortenPath( $file ) {
 		$file          = str_replace( '\\', '/', $file );
 		$shortenedName = $file;
 		$replaced      = false;
-		if ( is_array( self::$appRootDirs ) ) foreach ( self::$appRootDirs as $path => $replaceString ) {
-			if ( empty( $path ) ) continue;
+		if ( is_array( self::$appRootDirs ) ) {
+			foreach ( self::$appRootDirs as $path => $replaceString ) {
+				if ( empty( $path ) ) {
+					continue;
+				}
 
-			$path = str_replace( '\\', '/', $path );
+				$path = str_replace( '\\', '/', $path );
 
-			if ( strpos( $file, $path ) === 0 ) {
-				$shortenedName = $replaceString . substr( $file, strlen( $path ) );
-				$replaced      = true;
-				break;
+				if ( strpos( $file, $path ) === 0 ) {
+					$shortenedName = $replaceString . substr( $file, strlen( $path ) );
+					$replaced      = true;
+					break;
+				}
 			}
 		}
 
 		# fallback to find common path with Kint dir
-		if ( !$replaced ) {
+		if ( ! $replaced ) {
 			$pathParts = explode( '/', str_replace( '\\', '/', KINT_DIR ) );
 			$fileParts = explode( '/', $file );
 			$i         = 0;
 			foreach ( $fileParts as $i => $filePart ) {
-				if ( !isset( $pathParts[ $i ] ) || $pathParts[ $i ] !== $filePart ) break;
+				if ( ! isset( $pathParts[ $i ] ) || $pathParts[ $i ] !== $filePart ) {
+					break;
+				}
 			}
 
 			$shortenedName = ( $i ? '.../' : '' ) . implode( '/', array_slice( $fileParts, $i ) );
@@ -305,23 +316,21 @@ class Kint
 		return $shortenedName;
 	}
 
-	public static function getIdeLink( $file, $line )
-	{
+	public static function getIdeLink( $file, $line ) {
 		return str_replace( array( '%f', '%l' ), array( $file, $line ), self::$fileLinkFormat );
 	}
 
 	/**
 	 * trace helper, shows the place in code inline
 	 *
-	 * @param string $file full path to file
+	 * @param string $file       full path to file
 	 * @param int    $lineNumber the line to display
-	 * @param int    $padding surrounding lines to show besides the main one
+	 * @param int    $padding    surrounding lines to show besides the main one
 	 *
 	 * @return bool|string
 	 */
-	private static function _showSource( $file, $lineNumber, $padding = 7 )
-	{
-		if ( !$file OR !is_readable( $file ) ) {
+	private static function _showSource( $file, $lineNumber, $padding = 7 ) {
+		if ( ! $file OR ! is_readable( $file ) ) {
 			# continuing will cause errors
 			return false;
 		}
@@ -342,7 +351,7 @@ class Kint
 		$source = '';
 		while ( ( $row = fgets( $file ) ) !== false ) {
 			# increment the line number
-			if ( ++$line > $range['end'] ) {
+			if ( ++ $line > $range['end'] ) {
 				break;
 			}
 
@@ -380,8 +389,7 @@ class Kint
 	 *
 	 * @return array( $parameters, $modifier, $callee, $previousCaller )
 	 */
-	private static function _getCalleeInfo( $trace )
-	{
+	private static function _getCalleeInfo( $trace ) {
 		$previousCaller = array();
 		$miniTrace      = array();
 		$prevStep       = array();
@@ -401,7 +409,9 @@ class Kint
 		}
 		$callee = $step;
 
-		if ( !isset( $callee['file'] ) || !is_readable( $callee['file'] ) ) return false;
+		if ( ! isset( $callee['file'] ) || ! is_readable( $callee['file'] ) ) {
+			return false;
+		}
 
 
 		# open the file and read it up to the position where the function call expression ended
@@ -409,7 +419,9 @@ class Kint
 		$line   = 0;
 		$source = '';
 		while ( ( $row = fgets( $file ) ) !== false ) {
-			if ( ++$line > $callee['line'] ) break;
+			if ( ++ $line > $callee['line'] ) {
+				break;
+			}
 			$source .= $row;
 		}
 		fclose( $file );
@@ -453,7 +465,7 @@ class Kint
             \x07*
 
             # main call to Kint
-            {$codePattern}
+            ({$codePattern})
 
 			# spaces everywhere
             \x07*
@@ -469,10 +481,16 @@ class Kint
 
 		$modifiers  = end( $matches[1] );
 		$assignment = end( $matches[2] );
-		$bracket    = end( $matches[3] );
+		$callToKint = end( $matches[3] );
+		$bracket    = end( $matches[4] );
+
+		if ( empty( $callToKint ) ) {
+			# if a wrapper is misconfigured, don't display the whole file as variable name
+			return array( array(), $modifiers, $callee, $previousCaller, $miniTrace );
+		}
 
 		$modifiers = $modifiers[0];
-		if ( $assignment[1] !== -1 ) {
+		if ( $assignment[1] !== - 1 ) {
 			$modifiers .= '@';
 		}
 
@@ -491,23 +509,23 @@ class Kint
 		while ( $i < $c ) {
 			$letter = $paramsString[ $i ];
 
-			if ( !$inString ) {
+			if ( ! $inString ) {
 				if ( $letter === '\'' || $letter === '"' ) {
 					$inString = $letter;
 				} elseif ( $letter === '(' || $letter === '[' ) {
-					$inBrackets++;
+					$inBrackets ++;
 					$openedBrackets[] = $openedBracket = $letter;
 					$closingBracket   = $openedBracket === '(' ? ')' : ']';
 				} elseif ( $inBrackets && $letter === $closingBracket ) {
-					$inBrackets--;
+					$inBrackets --;
 					array_pop( $openedBrackets );
 					$openedBracket  = end( $openedBrackets );
 					$closingBracket = $openedBracket === '(' ? ')' : ']';
-				} elseif ( !$inBrackets && $letter === ')' ) {
+				} elseif ( ! $inBrackets && $letter === ')' ) {
 					$paramsString = substr( $paramsString, 0, $i );
 					break;
 				}
-			} elseif ( $letter === $inString && !$escaped ) {
+			} elseif ( $letter === $inString && ! $escaped ) {
 				$inString = false;
 			}
 
@@ -524,8 +542,8 @@ class Kint
 				}
 			}
 
-			$escaped = !$escaped && ( $letter === '\\' );
-			$i++;
+			$escaped = ! $escaped && ( $letter === '\\' );
+			$i ++;
 		}
 
 		# by now we have an un-nested arguments list, lets make it to an array for processing further
@@ -538,7 +556,7 @@ class Kint
 			$argument = trim( $argument );
 
 			if ( is_numeric( $argument )
-				|| in_array( str_replace( "'", '"', strtolower( $argument ) ), $blacklist, true )
+			     || in_array( str_replace( "'", '"', strtolower( $argument ) ), $blacklist, true )
 			) {
 				$parameters[] = null;
 			} else {
@@ -556,20 +574,25 @@ class Kint
 	 *
 	 * @return string
 	 */
-	private static function _removeAllButCode( $source )
-	{
+	private static function _removeAllButCode( $source ) {
 		$commentTokens    = array(
-			T_COMMENT => true, T_INLINE_HTML => true, T_DOC_COMMENT => true
+			T_COMMENT     => true,
+			T_INLINE_HTML => true,
+			T_DOC_COMMENT => true
 		);
 		$whiteSpaceTokens = array(
-			T_WHITESPACE => true, T_CLOSE_TAG => true,
-			T_OPEN_TAG   => true, T_OPEN_TAG_WITH_ECHO => true,
+			T_WHITESPACE         => true,
+			T_CLOSE_TAG          => true,
+			T_OPEN_TAG           => true,
+			T_OPEN_TAG_WITH_ECHO => true,
 		);
 
 		$cleanedSource = '';
 		foreach ( token_get_all( $source ) as $token ) {
 			if ( is_array( $token ) ) {
-				if ( isset( $commentTokens[ $token[0] ] ) ) continue;
+				if ( isset( $commentTokens[ $token[0] ] ) ) {
+					continue;
+				}
 
 				if ( isset( $whiteSpaceTokens[ $token[0] ] ) ) {
 					$token = "\x07";
@@ -582,6 +605,7 @@ class Kint
 
 			$cleanedSource .= $token;
 		}
+
 		return $cleanedSource;
 	}
 
@@ -592,30 +616,31 @@ class Kint
 	 *
 	 * @return array
 	 */
-	private static function _stepIsInternal( $step )
-	{
+	private static function _stepIsInternal( $step ) {
 		if ( isset( $step['class'] ) ) {
 			foreach ( self::$aliases['methods'] as $alias ) {
 				if ( $alias[0] === strtolower( $step['class'] ) && $alias[1] === strtolower( $step['function'] ) ) {
 					return true;
 				}
 			}
+
 			return false;
 		} else {
 			return in_array( strtolower( $step['function'] ), self::$aliases['functions'], true );
 		}
 	}
 
-	private static function _parseTrace( array $data )
-	{
+	private static function _parseTrace( array $data ) {
 		$trace       = array();
 		$traceFields = array( 'file', 'line', 'args', 'class' );
 		$fileFound   = false; # file element must exist in one of the steps
 
 		# validate whether a trace was indeed passed
 		while ( $step = array_pop( $data ) ) {
-			if ( !is_array( $step ) || !isset( $step['function'] ) ) return false;
-			if ( !$fileFound && isset( $step['file'] ) && file_exists( $step['file'] ) ) {
+			if ( ! is_array( $step ) || ! isset( $step['function'] ) ) {
+				return false;
+			}
+			if ( ! $fileFound && isset( $step['file'] ) && file_exists( $step['file'] ) ) {
 				$fileFound = true;
 			}
 
@@ -626,7 +651,9 @@ class Kint
 					break;
 				}
 			}
-			if ( !$valid ) return false;
+			if ( ! $valid ) {
+				return false;
+			}
 
 			if ( self::_stepIsInternal( $step ) ) {
 				$step = array(
@@ -641,7 +668,9 @@ class Kint
 				array_unshift( $trace, $step );
 			}
 		}
-		if ( !$fileFound ) return false;
+		if ( ! $fileFound ) {
+			return false;
+		}
 
 		$output = array();
 		foreach ( $trace as $step ) {
@@ -668,7 +697,7 @@ class Kint
 					$args = array( 'file' => self::shortenPath( $step['args'][0] ) );
 				}
 			} elseif ( isset( $step['args'] ) ) {
-				if ( empty( $step['class'] ) && !function_exists( $function ) ) {
+				if ( empty( $step['class'] ) && ! function_exists( $function ) ) {
 					# introspection on closures or language constructs in a stack trace is impossible before PHP 5.3
 					$params = null;
 				} else {
@@ -687,7 +716,8 @@ class Kint
 
 						# get the function parameters
 						$params = $reflection->getParameters();
-					} catch ( Exception $e ) { # avoid various PHP version incompatibilities
+					}
+					catch ( Exception $e ) { # avoid various PHP version incompatibilities
 						$params = null;
 					}
 				}
@@ -727,21 +757,23 @@ class Kint
 }
 
 
-if ( !function_exists( 'd' ) ) {
+if ( ! function_exists( 'd' ) ) {
 	/**
 	 * Alias of Kint::dump()
 	 *
 	 * @return string
 	 */
-	function d()
-	{
-		if ( !Kint::enabled() ) return '';
+	function d() {
+		if ( ! Kint::enabled() ) {
+			return '';
+		}
 		$_ = func_get_args();
+
 		return call_user_func_array( array( 'Kint', 'dump' ), $_ );
 	}
 }
 
-if ( !function_exists( 'dd' ) ) {
+if ( ! function_exists( 'dd' ) ) {
 	/**
 	 * Alias of Kint::dump()
 	 * [!!!] IMPORTANT: execution will halt after call to this function
@@ -749,34 +781,34 @@ if ( !function_exists( 'dd' ) ) {
 	 * @return string
 	 * @deprecated
 	 */
-	function dd()
-	{
-		if ( !Kint::enabled() ) return '';
-
-		echo "<pre>Kint: dd() is being deprecated, please use ddd() instead</pre>\n";
+	function dd() {
+		if ( ! Kint::enabled() ) {
+			return '';
+		}
 		$_ = func_get_args();
 		call_user_func_array( array( 'Kint', 'dump' ), $_ );
 		die;
 	}
 }
 
-if ( !function_exists( 'ddd' ) ) {
+if ( ! function_exists( 'ddd' ) ) {
 	/**
 	 * Alias of Kint::dump()
 	 * [!!!] IMPORTANT: execution will halt after call to this function
 	 *
 	 * @return string
 	 */
-	function ddd()
-	{
-		if ( !Kint::enabled() ) return '';
+	function ddd() {
+		if ( ! Kint::enabled() ) {
+			return '';
+		}
 		$_ = func_get_args();
 		call_user_func_array( array( 'Kint', 'dump' ), $_ );
 		die;
 	}
 }
 
-if ( !function_exists( 's' ) ) {
+if ( ! function_exists( 's' ) ) {
 	/**
 	 * Alias of Kint::dump(), however the output is in plain htmlescaped text and some minor visibility enhancements
 	 * added. If run in CLI mode, output is pure whitespace.
@@ -790,10 +822,11 @@ if ( !function_exists( 's' ) ) {
 	 *
 	 * @return string
 	 */
-	function s()
-	{
+	function s() {
 		$enabled = Kint::enabled();
-		if ( !$enabled ) return '';
+		if ( ! $enabled ) {
+			return '';
+		}
 
 		if ( $enabled === Kint::MODE_WHITESPACE ) { # if already in whitespace, don't elevate to plain
 			$restoreMode = Kint::MODE_WHITESPACE;
@@ -806,11 +839,12 @@ if ( !function_exists( 's' ) ) {
 		$params = func_get_args();
 		$dump   = call_user_func_array( array( 'Kint', 'dump' ), $params );
 		Kint::enabled( $restoreMode );
+
 		return $dump;
 	}
 }
 
-if ( !function_exists( 'sd' ) ) {
+if ( ! function_exists( 'sd' ) ) {
 	/**
 	 * @see s()
 	 *
@@ -818,10 +852,11 @@ if ( !function_exists( 'sd' ) ) {
 	 *
 	 * @return string
 	 */
-	function sd()
-	{
+	function sd() {
 		$enabled = Kint::enabled();
-		if ( !$enabled ) return '';
+		if ( ! $enabled ) {
+			return '';
+		}
 
 		if ( $enabled !== Kint::MODE_WHITESPACE ) {
 			Kint::enabled(
