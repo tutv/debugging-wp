@@ -32,7 +32,7 @@ However, it's much, much more than that. Even the excellent xdebug var_dump impr
 
 = How to use? =
 
-Use functions to debug: **s**, **sd**, **d**, **ddd**
+Use functions to debug: **s**, **sd**, **d**, **dd**
 
 Example:
 `<?php s($GLOBALS); ?>`
