@@ -779,7 +779,6 @@ if ( ! function_exists( 'dd' ) ) {
 	 * [!!!] IMPORTANT: execution will halt after call to this function
 	 *
 	 * @return string
-	 * @deprecated
 	 */
 	function dd() {
 		if ( ! Kint::enabled() ) {
