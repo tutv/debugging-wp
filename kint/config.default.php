@@ -81,6 +81,11 @@ $_kintSettings['maxLevels'] = 7;
 /** @var string name of theme for rich view */
 $_kintSettings['theme'] = 'original';
 
+$themes_debugging_wp = get_option( 'debugging_wp_theme' );
+
+if ( $themes_debugging_wp != false && $themes_debugging_wp != '' ) {
+	$_kintSettings['theme'] = $themes_debugging_wp;
+}
 
 /** @var bool enable detection when Kint is command line. Formats output with whitespace only; does not HTML-escape it */
 $_kintSettings['cliDetection'] = true;
